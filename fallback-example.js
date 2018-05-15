@@ -10,17 +10,17 @@ function unreliableServiceCall() {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       iterations++;
-      if (iterations === 10) {
-        successRate = 0.6;
+      switch (iterations) {
+        case 10:
+          successRate = 0.6;
+          break;
+        case 50:
+          successRate = 0.1;
+          break;
+        case 100:
+          successRate = 1;
+          break;
       }
-      else if (iterations === 50) {
-        successRate = 0.1;
-      }
-      else if (iterations === 100) {
-        successRate = 1;
-      }
-
-
       if (Math.random() <= successRate) {
         resolve();
       }
@@ -31,16 +31,15 @@ function unreliableServiceCall() {
   });
 }
 
-
 const brake = new Brakes(unreliableServiceCall, {
   statInterval: 2500,
-  threshold: 0.5,
+  threshold: 0.7,
   circuitDuration: 1500,
   timeout: 250
 });
 
 brake.on('snapshot', snapshot => {
-  console.log('Running at:', snapshot.stats.successful / snapshot.stats.total);
+  console.log('Success Rate:', snapshot.stats.successful / snapshot.stats.total);
   console.log(snapshot);
 });
 
